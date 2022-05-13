@@ -10,11 +10,26 @@ EVENT_LISTENER_PORT = 9099
 EVENT_SOURCE_PORT = 9090
 BUFFER_SIZE = 1024
 start = time.time()
+retry = 3
+sleep_time = 1
+
+
+def connect(s, port):
+    connected = False
+    current = 0
+    while not connected and current < retry:
+        try:
+            s.connect((HOST, port))
+            connected = True
+        except:
+            time.sleep(3)
+            current = current + 1
+
 
 def get_matches():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, EVENT_SOURCE_PORT))
+            connect(s, EVENT_SOURCE_PORT)
             print('Start retrieving from Source', time.time - start)
             data = s.recv(BUFFER_SIZE)
             like_string = data.decode("utf-8")
@@ -67,7 +82,7 @@ def get_matches():
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, EVENT_LISTENER_PORT))
+            connect(s, EVENT_LISTENER_PORT)
             print("Sending results matches to listener", time.time - start)
             print(s.recv(BUFFER_SIZE))
             response = ''
@@ -86,7 +101,5 @@ def get_matches():
 
 if __name__ == '__main__':
     print('Match finder started', )
-    # workaround to make sure the event source container is already up
-    time.sleep(1)
     get_matches()
     print('Match finder finalized', time.time - start)

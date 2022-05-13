@@ -27,11 +27,12 @@ def connect(s, port):
     if current >= retry:
         raise Exception("Connection to Event Source Failed")
 
+    return s
 
 def get_matches():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            connect(s, EVENT_SOURCE_PORT)
+            s = connect(s, EVENT_SOURCE_PORT)
             print('Start retrieving from Source', time.time - start)
             data = s.recv(BUFFER_SIZE)
             like_string = data.decode("utf-8")

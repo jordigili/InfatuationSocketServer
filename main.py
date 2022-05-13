@@ -84,5 +84,5 @@ def get_matches():
 
 
 if __name__ == '__main__':
-    time.sleep(5)
+    time.sleep(3)
     get_matches()

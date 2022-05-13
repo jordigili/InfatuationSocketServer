@@ -21,9 +21,11 @@ def connect(s, port):
         try:
             s.connect((HOST, port))
             connected = True
-        except:
+        except socket.error:
             time.sleep(3)
             current = current + 1
+    if current >= retry:
+        raise Exception("Connection to Event Source Failed")
 
 
 def get_matches():
@@ -69,8 +71,6 @@ def get_matches():
 
             print("Found ", len(result), " matches", time.time - start)
 
-    except socket.error as e:
-        print("Socket error on event source: ", e)
     except ImportError as e:
         print("Error conversion to csv: ", e)
     except pd.errors.ParserError as e:
@@ -91,8 +91,6 @@ def get_matches():
             s.send(bytearray(response, "utf-8"))
             print(s.recv(BUFFER_SIZE))
             s.close()
-    except socket.error as e:
-        print("Socket error on event listener: ", e)
     except BaseException as err:
         print("Unclassified error", err)
     finally:

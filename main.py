@@ -3,7 +3,7 @@ from io import StringIO
 import pandas as pd
 import numpy as np
 
-HOST = "event_server"
+HOST = "127.0.0.1"
 EVENT_LISTENER_PORT = 9099
 EVENT_SOURCE_PORT = 9090
 BUFFER_SIZE = 1024

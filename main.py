@@ -3,18 +3,19 @@ import time
 from io import StringIO
 import pandas as pd
 import numpy as np
+import time
 
 HOST = "event_server"
 EVENT_LISTENER_PORT = 9099
 EVENT_SOURCE_PORT = 9090
 BUFFER_SIZE = 1024
-
+start = time.time()
 
 def get_matches():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, EVENT_SOURCE_PORT))
-            print('Start retrieving from Source')
+            print('Start retrieving from Source', time.time - start)
             data = s.recv(BUFFER_SIZE)
             like_string = data.decode("utf-8")
             buffering = True
@@ -22,7 +23,7 @@ def get_matches():
                 data = s.recv(BUFFER_SIZE)
                 like_string += data.decode("utf-8")
                 if 'EVENT END' in data.decode("utf-8"):
-                    print('Finish retrieving from Source')
+                    print('Finish retrieving from Source', time.time - start)
                     buffering = False
 
             # this is done to give a name to pandas dataframe columns
@@ -37,7 +38,7 @@ def get_matches():
             # we only care about likes
             onlyLike = df[df.type == 'LIKE_LIKED']
 
-            print('Performing join on likes')
+            print('Performing join on likes', time.time - start)
             # we join twice on the dataframe to find the matches
             match_dataframe = pd.merge(onlyLike, onlyLike, how="inner", left_on=['from_user', 'to_user'],
                                        right_on=['to_user', 'from_user'])
@@ -51,7 +52,7 @@ def get_matches():
             # remove duplicates
             result = match_dataframe.result.unique()
 
-            print("Found ", len(result), " matches")
+            print("Found ", len(result), " matches", time.time - start)
 
     except socket.error as e:
         print("Socket error on event source: ", e)
@@ -67,7 +68,7 @@ def get_matches():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, EVENT_LISTENER_PORT))
-            print("Sending results matches to listener")
+            print("Sending results matches to listener", time.time - start)
             print(s.recv(BUFFER_SIZE))
             response = ''
             for index, match in enumerate(result, start=0):
@@ -84,8 +85,8 @@ def get_matches():
 
 
 if __name__ == '__main__':
-    print('Match finder started')
+    print('Match finder started', )
     # workaround to make sure the event source container is already up
     time.sleep(3)
     get_matches()
-    print('Match finder finalized')
+    print('Match finder finalized', time.time - start)

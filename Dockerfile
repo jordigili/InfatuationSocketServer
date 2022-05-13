@@ -10,4 +10,5 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 EXPOSE 9090 9099
-ENTRYPOINT [ "python3", "main.py"]
+CMD [ "./wait_server_ip.sh"]
+CMD ["python3", "main.py"]

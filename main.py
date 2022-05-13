@@ -17,8 +17,10 @@ def connect(s, port):
     while not connected and current < retry:
         try:
             s.connect((HOST, port))
+            print('Connection established')
             connected = True
         except socket.error:
+            print('Retyring to connect', current)
             time.sleep(3)
             current = current + 1
     if current >= retry:

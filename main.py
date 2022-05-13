@@ -20,9 +20,9 @@ def connect(s, port):
             print('Connection established')
             connected = True
         except socket.error:
+            current += 1
             print('Retyring to connect', current)
             time.sleep(3)
-            current = current + 1
     if current >= retry:
         raise Exception("Connection to Event Source Failed")
 

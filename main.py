@@ -86,6 +86,6 @@ def get_matches():
 if __name__ == '__main__':
     print('Match finder started')
     # workaround to make sure the event source container is already up
-    time.sleep(2)
+    time.sleep(3)
     get_matches()
     print('Match finder finalized')

@@ -4,19 +4,21 @@ import pandas as pd
 import numpy as np
 
 HOST = "127.0.0.1"
-PORT = 9090
+EVENT_LISTENER_PORT = 9099
+EVENT_SOURCE_PORT = 9090
+BUFFER_SIZE = 1024
 
 
 def get_matches():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
+            s.connect((HOST, EVENT_SOURCE_PORT))
             print('Start retrieving from Source')
-            data = s.recv(1024)
+            data = s.recv(BUFFER_SIZE)
             like_string = data.decode("utf-8")
             buffering = True
             while buffering:
-                data = s.recv(1024)
+                data = s.recv(BUFFER_SIZE)
                 like_string += data.decode("utf-8")
                 if 'EVENT END' in data.decode("utf-8"):
                     print('Finish retrieving from Source')
@@ -63,14 +65,14 @@ def get_matches():
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, 9099))
+            s.connect((HOST, EVENT_LISTENER_PORT))
             print("Sending results matches to listener")
-            print(s.recv(4096))
+            print(s.recv(BUFFER_SIZE))
             response = ''
             for index, match in enumerate(result, start=0):
                 response += str(match) + '\n'
             s.send(bytearray(response, "utf-8"))
-            print(s.recv(4096))
+            print(s.recv(BUFFER_SIZE))
             s.close()
     except socket.error as e:
         print("Socket error on event listener: ", e)

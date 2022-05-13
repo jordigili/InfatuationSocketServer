@@ -1,4 +1,5 @@
 import socket
+import time
 from io import StringIO
 import pandas as pd
 import numpy as np
@@ -83,4 +84,5 @@ def get_matches():
 
 
 if __name__ == '__main__':
+    time.sleep(5)
     get_matches()

@@ -3,6 +3,7 @@ import time
 from io import StringIO
 import pandas as pd
 import numpy as np
+import logging
 
 HOST = "event_server"
 EVENT_LISTENER_PORT = 9099
@@ -10,6 +11,7 @@ EVENT_SOURCE_PORT = 9090
 BUFFER_SIZE = 1024
 retry = 3
 
+logging.basicConfig(filename='errors.log', encoding='utf-8', level=logging.DEBUG)
 
 def connect(s, port):
     connected = False
@@ -72,16 +74,6 @@ def get_matches():
 
             print("Found ", len(result), " matches")
 
-    except ImportError as e:
-        print("Error conversion to csv: ", e)
-    except pd.errors.ParserError as e:
-        print("Error parsing data frame: ", e)
-    except BaseException as err:
-        print("Unclassified error", err)
-    finally:
-        s.close()
-
-    try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             connect(s, EVENT_LISTENER_PORT)
             print("Sending results matches to listener")
@@ -92,8 +84,12 @@ def get_matches():
             s.send(bytearray(response, "utf-8"))
             print(s.recv(BUFFER_SIZE))
             s.close()
+    except ImportError:
+        logging.error('Error conversion to csv')
+    except pd.errors.ParserError as e:
+        logging.error("Error parsing data frame: ")
     except BaseException as err:
-        print("Unclassified error", err)
+        logging.error("Unclassified error")
     finally:
         s.close()
 

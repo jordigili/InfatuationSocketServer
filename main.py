@@ -87,7 +87,7 @@ def get_matches():
     except ImportError:
         logging.error('Error conversion to csv')
     except pd.errors.ParserError as e:
-        logging.error("Error parsing data frame: ")
+        logging.error("Error parsing data frame")
     except BaseException as err:
         logging.error("Unclassified error")
     finally:
